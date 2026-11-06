@@ -2,28 +2,46 @@ workflows:
   android-debug-apk:
     name: Linux Terminal Android - Debug APK
     max_build_duration: 60
+
+    # mac_mini_m2 is available on Codemagic's free Individual plan.
+    # linux_x2 requires billing to be enabled.
     instance_type: mac_mini_m2
+
     environment:
       java: 17
       vars:
         GRADLE_VERSION: "8.11.1"
+
     scripts:
-      - name: Verify build tools
+      - name: Check Android build environment
         script: |
+          set -e
           java -version
+          echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-not-set}"
+          echo "ANDROID_HOME=${ANDROID_HOME:-not-set}"
+          if [ -z "${ANDROID_SDK_ROOT:-}" ] && [ -z "${ANDROID_HOME:-}" ]; then
+            echo "Android SDK path was not configured on this worker."
+            exit 1
+          fi
+
+      - name: Ensure Gradle is available
+        script: |
+          set -e
           if ! command -v gradle >/dev/null 2>&1; then
-            echo "Gradle is not preinstalled; downloading Gradle ${GRADLE_VERSION}"
+            echo "Downloading Gradle ${GRADLE_VERSION}..."
             curl --fail --location --retry 3 \
               "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" \
-              --output /tmp/gradle.zip
-            unzip -q /tmp/gradle.zip -d /tmp
-            export PATH="/tmp/gradle-${GRADLE_VERSION}/bin:$PATH"
+              --output "$HOME/gradle-${GRADLE_VERSION}-bin.zip"
+            unzip -q "$HOME/gradle-${GRADLE_VERSION}-bin.zip" -d "$HOME"
+            export PATH="$HOME/gradle-${GRADLE_VERSION}/bin:$PATH"
+            echo "PATH=$HOME/gradle-${GRADLE_VERSION}/bin:$PATH" >> "$CM_ENV"
           fi
           gradle --version
-          echo "export PATH=\"$(dirname "$(command -v gradle)"):$PATH\"" >> "$CM_ENV"
-      - name: Build debug APK
+
+      - name: Build Android debug APK
         script: |
+          set -e
           gradle --no-daemon --stacktrace :app:assembleDebug
+
     artifacts:
       - app/build/outputs/apk/debug/*.apk
-      - app/build/outputs/mapping/**/mapping.txt

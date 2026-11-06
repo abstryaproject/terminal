@@ -9,14 +9,14 @@ This repository is a **buildable first milestone**, not the finished Debian envi
 - Interactive unprivileged Android `/system/bin/sh` host shell.
 - Codemagic workflow that builds and exports a debug APK.
 
-## Build on Codemagic
+## Codemagic instance-type fix\nThe workflow is configured for `mac_mini_m2`, not `linux_x2`. Codemagic documents that Linux X2 requires billing to be enabled; the free Individual plan includes 500 monthly minutes on macOS M2. If the account is a Team account, free minutes do not apply. See Codemagic's current pricing and instance-type documentation.\n\n## Build on Codemagic
 1. Create a new Codemagic app and connect this repository.
 2. Commit/push the contents of this folder to the repository root.
 3. In Codemagic, select the `android-debug-apk` workflow from `codemagic.yaml`.
 4. Start the build.
 5. Download `app-debug.apk` from the build's Artifacts section.
 
-The workflow uses Java 17, Android Gradle Plugin 8.10.1, Gradle 8.11.1, Android SDK 35, NDK and CMake 3.22.1. If Gradle is absent on the selected worker, the workflow downloads Gradle 8.11.1.
+The workflow uses `mac_mini_m2`, which is available on Codemagic's free Individual plan (subject to its monthly free-minute allowance). `linux_x2` is a billing-enabled instance and causes the reported plan-availability error when billing is not enabled. The workflow uses Java 17, Android Gradle Plugin 8.10.1, Gradle 8.11.1, Android SDK 35, NDK and CMake 3.22.1. If Gradle is absent on the selected worker, the workflow downloads Gradle 8.11.1.
 
 ## Build locally
 Open the folder in Android Studio, install Android SDK 35, NDK and CMake 3.22.1, sync Gradle, then run:

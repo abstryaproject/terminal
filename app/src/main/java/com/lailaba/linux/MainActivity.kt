@@ -1,6 +1,7 @@
 package com.lailaba.linux
 
 import android.os.Bundle
+import java.io.File
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        File(filesDir, "home").mkdirs()
         setContent {
             MaterialTheme(
                 colorScheme = darkColorScheme(

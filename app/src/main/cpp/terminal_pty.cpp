@@ -59,7 +59,7 @@ Java_com_lailaba_linux_NativePty_start(JNIEnv*, jobject) {
         if (slave > STDERR_FILENO) close(slave);
 
         setenv("TERM", "xterm-256color", 1);
-        setenv("HOME", "/data/local/tmp", 1);
+        setenv("HOME", "/data/data/com.lailaba.terminal/files/home", 1);
         setenv("PATH", "/system/bin:/system/xbin", 1);
         execl("/system/bin/sh", "sh", "-i", static_cast<char*>(nullptr));
         _exit(127);
